@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,1">
+          <property name="sizeConstraint">
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>WORK TIME (H:MM)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QTimeEdit" name="timeEdit_2">
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QTimeEdit {
+    border: 2px solid #4a62ad;       /* Синяя рамка */
+    border-radius: 6px;              /* Скругление углов */
+    padding: 5px 10px;               /* Отступы внутри поля */
+    background-color: #ffffff;       /* Цвет фона */
+    color: #333333;                  /* Цвет текста */
+    font-family: &quot;Segoe UI&quot;, Arial;  /* Шрифт */
+    font-size: 16px;                 /* Размер текста */
+    font-weight: bold;
+}
+
+/* Стиль при наведении мыши на поле */
+QTimeEdit:hover {
+    border: 2px solid #354580;       /* Темно-синяя рамка */
+}
+
+/* Стилизация блока с кнопками &quot;вверх-вниз&quot; */
+QTimeEdit::up-button, QTimeEdit::down-button {
+    subcontrol-origin: border;
+    width: 20px;                     /* Ширина кнопок */
+    background: #eaeaea;             /* Фон кнопок */
+    border-left: 1px solid #4a62ad;  /* Разделительная линия */
+}
+
+/* Отдельно верхняя кнопка */
+QTimeEdit::up-button {
+    subcontrol-position: top right;  /* Позиция вверху справа */
+    border-top-right-radius: 4px;
+}
+
+/* Отдельно нижняя кнопка */
+QTimeEdit::down-button {
+    subcontrol-position: bottom right; /* Позиция внизу справа */
+    border-bottom-right-radius: 4px;
+}
+
+/* Эффект при нажатии на кнопки */
+QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
+    background: #4a62ad;
+}</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>REST TIME (H:MM)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="0">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="2">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPushButton" name="startCycleButton">
+            <property name="text">
+             <string>START</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QTimeEdit" name="timeEdit">
+            <property name="styleSheet">
+             <string notr="true">QTimeEdit {
+    border: 2px solid #4a62ad;       /* Синяя рамка */
+    border-radius: 6px;              /* Скругление углов */
+    padding: 5px 10px;               /* Отступы внутри поля */
+    background-color: #ffffff;       /* Цвет фона */
+    color: #333333;                  /* Цвет текста */
+    font-family: &quot;Segoe UI&quot;, Arial;  /* Шрифт */
+    font-size: 16px;                 /* Размер текста */
+    font-weight: bold;
+}
+
+/* Стиль при наведении мыши на поле */
+QTimeEdit:hover {
+    border: 2px solid #354580;       /* Темно-синяя рамка */
+}
+
+/* Стилизация блока с кнопками &quot;вверх-вниз&quot; */
+QTimeEdit::up-button, QTimeEdit::down-button {
+    subcontrol-origin: border;
+    width: 20px;                     /* Ширина кнопок */
+    background: #eaeaea;             /* Фон кнопок */
+    border-left: 1px solid #4a62ad;  /* Разделительная линия */
+}
+
+/* Отдельно верхняя кнопка */
+QTimeEdit::up-button {
+    subcontrol-position: top right;  /* Позиция вверху справа */
+    border-top-right-radius: 4px;
+}
+
+/* Отдельно нижняя кнопка */
+QTimeEdit::down-button {
+    subcontrol-position: bottom right; /* Позиция внизу справа */
+    border-bottom-right-radius: 4px;
+}
+
+/* Эффект при нажатии на кнопки */
+QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
+    background: #4a62ad;
+}</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="layoutDirection">
+               <enum>Qt::LayoutDirection::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>NUMBER OF CYCLES</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBox"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="stopCycleButton">
+            <property name="text">
+             <string>STOP</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pauseCycleButton">
+            <property name="text">
+             <string>PAUSE</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="GaugeWidget" name="widget" native="true">
+            <property name="backgroundColor" stdset="0">
+             <color>
+              <red>255</red>
+              <green>255</green>
+              <blue>255</blue>
+             </color>
+            </property>
+            <property name="progressBarColor" stdset="0">
+             <color>
+              <red>226</red>
+              <green>62</green>
+              <blue>255</blue>
+             </color>
+            </property>
+            <property name="value" stdset="0">
+             <number>25</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>500</width>
+     <height>33</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GaugeWidget</class>
+   <extends>QWidget</extends>
+   <header>gauge_widget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
