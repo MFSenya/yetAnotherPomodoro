@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>497</width>
     <height>300</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -44,7 +44,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QTimeEdit" name="timeEdit_2">
+           <widget class="QTimeEdit" name="workTimeTimeEdit">
             <property name="focusPolicy">
              <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
@@ -155,7 +155,7 @@ QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QTimeEdit" name="timeEdit">
+           <widget class="QTimeEdit" name="restTimeTimeEdit">
             <property name="styleSheet">
              <string notr="true">QTimeEdit {
     border: 2px solid #4a62ad;       /* Синяя рамка */
@@ -249,25 +249,7 @@ QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
            </widget>
           </item>
           <item row="0" column="0" colspan="2">
-           <widget class="GaugeWidget" name="widget" native="true">
-            <property name="backgroundColor" stdset="0">
-             <color>
-              <red>255</red>
-              <green>255</green>
-              <blue>255</blue>
-             </color>
-            </property>
-            <property name="progressBarColor" stdset="0">
-             <color>
-              <red>226</red>
-              <green>62</green>
-              <blue>255</blue>
-             </color>
-            </property>
-            <property name="value" stdset="0">
-             <number>25</number>
-            </property>
-           </widget>
+           <widget class="PomodoroTimer" name="pomodoroTimer" native="true"/>
           </item>
          </layout>
         </item>
@@ -282,7 +264,7 @@ QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>500</width>
+     <width>497</width>
      <height>33</height>
     </rect>
    </property>
@@ -291,9 +273,9 @@ QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GaugeWidget</class>
+   <class>PomodoroTimer</class>
    <extends>QWidget</extends>
-   <header>gauge_widget</header>
+   <header>src.views.components.pomodoro_timer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

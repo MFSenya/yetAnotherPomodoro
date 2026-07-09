@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'pomodoro.ui'
+## Form generated from reading UI file 'main_window.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.11.1
 ##
@@ -21,13 +21,13 @@ from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QGridLayout, QHBo
     QStackedWidget, QStatusBar, QTimeEdit, QVBoxLayout,
     QWidget)
 
-from gauge_widget import GaugeWidget
+from src.views.components.pomodoro_timer import PomodoroTimer
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(500, 300)
+        MainWindow.resize(497, 300)
         MainWindow.setMaximumSize(QSize(500, 400))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -48,10 +48,10 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
 
-        self.timeEdit_2 = QTimeEdit(self.page)
-        self.timeEdit_2.setObjectName(u"timeEdit_2")
-        self.timeEdit_2.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
-        self.timeEdit_2.setStyleSheet(u"QTimeEdit {\n"
+        self.workTimeTimeEdit = QTimeEdit(self.page)
+        self.workTimeTimeEdit.setObjectName(u"workTimeTimeEdit")
+        self.workTimeTimeEdit.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.workTimeTimeEdit.setStyleSheet(u"QTimeEdit {\n"
 "    border: 2px solid #4a62ad;       /* \u0421\u0438\u043d\u044f\u044f \u0440\u0430\u043c\u043a\u0430 */\n"
 "    border-radius: 6px;              /* \u0421\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u0438\u0435 \u0443\u0433\u043b\u043e\u0432 */\n"
 "    padding: 5px 10px;               /* \u041e\u0442\u0441\u0442\u0443\u043f\u044b \u0432\u043d\u0443\u0442\u0440\u0438 \u043f\u043e\u043b\u044f */\n"
@@ -93,10 +93,10 @@ class Ui_MainWindow(object):
 "QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {\n"
 "    background: #4a62ad;\n"
 "}")
-        self.timeEdit_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.timeEdit_2.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.workTimeTimeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.workTimeTimeEdit.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
 
-        self.gridLayout.addWidget(self.timeEdit_2, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.workTimeTimeEdit, 1, 0, 1, 1)
 
         self.label_3 = QLabel(self.page)
         self.label_3.setObjectName(u"label_3")
@@ -121,9 +121,9 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.startCycleButton, 4, 1, 1, 1)
 
-        self.timeEdit = QTimeEdit(self.page)
-        self.timeEdit.setObjectName(u"timeEdit")
-        self.timeEdit.setStyleSheet(u"QTimeEdit {\n"
+        self.restTimeTimeEdit = QTimeEdit(self.page)
+        self.restTimeTimeEdit.setObjectName(u"restTimeTimeEdit")
+        self.restTimeTimeEdit.setStyleSheet(u"QTimeEdit {\n"
 "    border: 2px solid #4a62ad;       /* \u0421\u0438\u043d\u044f\u044f \u0440\u0430\u043c\u043a\u0430 */\n"
 "    border-radius: 6px;              /* \u0421\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u0438\u0435 \u0443\u0433\u043b\u043e\u0432 */\n"
 "    padding: 5px 10px;               /* \u041e\u0442\u0441\u0442\u0443\u043f\u044b \u0432\u043d\u0443\u0442\u0440\u0438 \u043f\u043e\u043b\u044f */\n"
@@ -165,10 +165,10 @@ class Ui_MainWindow(object):
 "QTimeEdit::up-button:pressed, QTimeEdit::down-button:pressed {\n"
 "    background: #4a62ad;\n"
 "}")
-        self.timeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.timeEdit.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.restTimeTimeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.restTimeTimeEdit.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
 
-        self.gridLayout.addWidget(self.timeEdit, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.restTimeTimeEdit, 1, 2, 1, 1)
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -210,13 +210,10 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.pauseCycleButton, 1, 1, 1, 1)
 
-        self.widget = GaugeWidget(self.page_2)
-        self.widget.setObjectName(u"widget")
-        self.widget.setProperty(u"backgroundColor", QColor(255, 255, 255))
-        self.widget.setProperty(u"progressBarColor", QColor(226, 62, 255))
-        self.widget.setProperty(u"value", 25)
+        self.pomodoroTimer = PomodoroTimer(self.page_2)
+        self.pomodoroTimer.setObjectName(u"pomodoroTimer")
 
-        self.gridLayout_2.addWidget(self.widget, 0, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.pomodoroTimer, 0, 0, 1, 2)
 
         self.gridLayout_2.setColumnStretch(0, 1)
         self.gridLayout_2.setColumnStretch(1, 1)
@@ -230,7 +227,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 500, 33))
+        self.menubar.setGeometry(QRect(0, 0, 497, 33))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -238,7 +235,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
