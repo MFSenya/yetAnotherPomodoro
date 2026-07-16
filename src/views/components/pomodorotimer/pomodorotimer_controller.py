@@ -27,15 +27,20 @@ class PomodoroTimerController(QObject):
         self._rest_time_interval : timedelta = timedelta()
         self._number_of_cycles = 0
         self._current_cycle = 1
-        self._ellapsed_time : timedelta = timedelta()
+        self._elapsed_time : timedelta = timedelta()
         self._start_time = None
         self._current_mode = self.Mode.IDLE
         self._next_mode = self.Mode.WORK
-        self._timer = QTimer()
+        self._timer = QTimer(self)
         self._timer.setInterval(timer_interval_ms)
         self._timer.timeout.connect(self.__tick)
         self._new_period_auto_start = False
 
+
+    @property
+    def elapsedTime(self) -> timedelta:
+        """Get elapsed time."""
+        return self._elapsed_time
 
     @property
     def currentMode(self):
@@ -104,15 +109,15 @@ class PomodoroTimerController(QObject):
 
     def stop(self):
         self.currentCycle = 1
-        self._ellapsed_time = timedelta()
+        self._elapsed_time = timedelta()
         self.currentMode = self.Mode.IDLE
         self.finished.emit()
 
 
     def __tick(self):
-        self._ellapsed_time = datetime.now() - self._start_time
+        self._elapsed_time = datetime.now() - self._start_time
         self.time_changed.emit()
-        if self._ellapsed_time > self.__get_time_interval():
+        if self._elapsed_time > self.__get_time_interval():
             self.__period_finished()
 
 
