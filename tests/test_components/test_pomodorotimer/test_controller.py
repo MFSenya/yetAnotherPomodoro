@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-import pytest
 from PySide6.QtTest import QSignalSpy
+from PySide6.QtCore import QEventLoop
 
 from src.views.components.pomodorotimer.pomodorotimer_controller import PomodoroTimerController
 
@@ -66,3 +66,28 @@ class TestPomodoroTimerControllerSignals:
             timer_controller.start()
         
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
+
+    def test_timer_elapsed_time_updates_correctly_after_series_of_ticks(self, qapp):
+        """Check that timer ellapsed time updates correctly after series of ticks."""
+        timer_interval_ms = 10
+        timer_controller = PomodoroTimerController(timer_interval_ms=timer_interval_ms)
+        timer_controller.numberOfCycles = 1
+        timer_controller.workTimeInterval = timedelta(milliseconds=100*timer_interval_ms)
+
+        loop = QEventLoop()
+        count = 0
+        number_of_ticks_to_wait = 10
+        def on_time_changed():
+            nonlocal count
+            count += 1
+            if count == number_of_ticks_to_wait:
+                loop.quit()
+
+        timer_controller.time_changed.connect(on_time_changed)
+        timer_controller.start()
+        loop.exec()
+
+        expected_time = timedelta(milliseconds=number_of_ticks_to_wait * timer_interval_ms)
+        actual_time = timer_controller.elapsedTime
+        allowed_delta = timedelta(milliseconds=timer_interval_ms*3) 
+        assert abs(actual_time - expected_time) <= allowed_delta, f"Expected elapsed time: {expected_time}, Actual elapsed time: {actual_time}"
