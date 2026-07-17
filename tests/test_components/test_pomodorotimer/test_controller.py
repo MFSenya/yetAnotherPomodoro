@@ -67,12 +67,13 @@ class TestPomodoroTimerControllerSignals:
         
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
 
-    def test_timer_elapsed_time_updates_correctly_after_series_of_ticks(self, qapp):
-        """Check that timer ellapsed time updates correctly after series of ticks."""
+    def test_timer_elapsed_time_updates_correctly_after_a_series_of_ticks(self, qapp):
+        """Check that timer ellapsed time updates correctly after a series of ticks."""
         timer_interval_ms = 10
         timer_controller = PomodoroTimerController(timer_interval_ms=timer_interval_ms)
         timer_controller.numberOfCycles = 1
         timer_controller.workTimeInterval = timedelta(milliseconds=100*timer_interval_ms)
+        timer_controller.restTimeInterval = timedelta(milliseconds=10*timer_interval_ms)
 
         loop = QEventLoop()
         count = 0
@@ -91,3 +92,30 @@ class TestPomodoroTimerControllerSignals:
         actual_time = timer_controller.elapsedTime
         allowed_delta = timedelta(milliseconds=timer_interval_ms*3) 
         assert abs(actual_time - expected_time) <= allowed_delta, f"Expected elapsed time: {expected_time}, Actual elapsed time: {actual_time}"
+
+    def test_timer_progress_updates_correctly_after_a_series_of_ticks(self, qapp):
+        """Check that timer progress time updates correctly after a series of ticks."""
+        timer_interval_ms = 10
+        timer_controller = PomodoroTimerController(timer_interval_ms=timer_interval_ms)
+        timer_controller.numberOfCycles = 1
+        timer_controller.workTimeInterval = timedelta(milliseconds=100*timer_interval_ms)
+        timer_controller.restTimeInterval = timedelta(milliseconds=10*timer_interval_ms)
+
+        loop = QEventLoop()
+        count = 0
+        number_of_ticks_to_wait = 10
+        def on_time_changed():
+            nonlocal count
+            count += 1
+            if count == number_of_ticks_to_wait:
+                loop.quit()
+
+        timer_controller.time_changed.connect(on_time_changed)
+        timer_controller.start()
+        loop.exec()
+
+        expected_progress = 10
+        actual_progress = timer_controller.currentIntervalProgress
+        allowed_delta = 1
+        assert timer_controller.currentMode == timer_controller.Mode.WORK
+        assert abs(actual_progress - expected_progress) <= allowed_delta, f"Expected progress: {expected_progress}, Actual progress: {actual_progress}"
