@@ -89,7 +89,13 @@ class PomodoroTimerController(QObject):
     
     @restTimeInterval.setter
     def restTimeInterval(self, interval: timedelta):
-        self._work_time_interval = interval
+        self._rest_time_interval = interval
+
+    @property
+    def currentIntervalProgress(self):
+        """Get progress in percents for current interval."""
+        progress_value = int(self.elapsedTime.total_seconds() / self.__get_time_interval().total_seconds() * 100)
+        return progress_value 
 
 
     def toggle_pause(self):
