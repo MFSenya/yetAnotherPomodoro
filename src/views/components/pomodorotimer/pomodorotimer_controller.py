@@ -106,7 +106,8 @@ class PomodoroTimerController(QObject):
                 self._timer.stop()
                 self.currentMode = self.Mode.IDLE
             case self.Mode.IDLE:
-                self.start()
+                self.currentMode = self._next_mode
+                self._timer.start()
             case _:
                 raise self.PomodoroTimerException("Can't pause in this mode")
     
