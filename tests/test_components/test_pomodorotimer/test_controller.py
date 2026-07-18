@@ -51,17 +51,16 @@ class TestPomodoroTimerControllerSignals:
            when it resumed manually after first period finish and auto pause."""
         timer_controller = PomodoroTimerController(timer_interval_ms=timer_interval_ms)
         timer_controller.numberOfCycles = 1
-        timer_controller.workTimeInterval = timedelta(milliseconds=50)
-        timer_controller.restTimeInterval = timedelta(milliseconds=5)
+        timer_controller.workTimeInterval = timedelta(milliseconds=5*timer_interval_ms)
+        timer_controller.restTimeInterval = timedelta(milliseconds=5*timer_interval_ms)
 
-        period_spy = QSignalSpy(timer_controller.period_changed)
         finished_spy = QSignalSpy(timer_controller.finished)
 
         timer_controller.start()
-
-        # Wait for period change
-        qtbot.waitUntil(lambda: period_spy.count() >= 1, timeout=100)
+        # Wait for the work interval end (add an extra milliseconds to ensure that we wait long enough)
+        qtbot.wait((timer_controller.workTimeInterval.total_seconds())*1000 + 100)
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
+        # Resume
         timer_controller.toggle_pause()
         # Wait for finish signal
         qtbot.waitUntil(lambda: finished_spy.count() == 1, timeout=100)
@@ -83,15 +82,15 @@ class TestPomodoroTimerControllerSignals:
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
 
 
-    def test_timer_emits_period_changed_and_paused_automatically(self, qtbot):
-        """Check that after change of a period timer pauses automatically."""
+    def test_timer_pauses_automatically_after_work_interval_end(self, qtbot):
+        """Check that pauses automatically after work interval end."""
         timer_controller = PomodoroTimerController(timer_interval_ms=timer_interval_ms)
         timer_controller.numberOfCycles = 1
-        timer_controller.workTimeInterval = timedelta(milliseconds=5)
+        timer_controller.workTimeInterval = timedelta(milliseconds=5*timer_interval_ms)
 
-        with qtbot.waitSignal(timer_controller.period_changed, timeout=100):
-            timer_controller.start()
-        
+        timer_controller.start()
+        # Wait for the work interval end (add an extra milliseconds to ensure that we wait long enough)
+        qtbot.wait(timer_controller.workTimeInterval.total_seconds()*1000 + 100)
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
 
     def test_timer_elapsed_time_updates_correctly_after_a_series_of_ticks(self, qapp):
