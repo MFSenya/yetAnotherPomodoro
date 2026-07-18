@@ -94,6 +94,8 @@ class PomodoroTimerController(QObject):
     @property
     def currentIntervalProgress(self):
         """Get progress in percents for current interval."""
+        if self._start_time is None:
+            raise self.PomodoroTimerException("Сan't get current progress. Timer has not been started")
         progress_value = int(self.elapsedTime.total_seconds() / self.__get_time_interval().total_seconds() * 100)
         return progress_value 
 
