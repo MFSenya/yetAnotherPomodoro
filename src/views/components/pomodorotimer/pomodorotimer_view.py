@@ -42,7 +42,7 @@ class PomodoroTimerView(QStackedWidget):
             self.setLayout(_layout)
         
         def __on_button_start_cycle_click(self):
-            self._controller.numberOfCycles = self._spinbox_number_of_cycles
+            self._controller.numberOfCycles = self._spinbox_number_of_cycles.value()
             self._controller.workTimeInterval = timedelta(minutes=self._time_edit_work_time_interval.time().minute())
             self._controller.restTimeInterval = timedelta(minutes=self._time_edit_rest_time_interval.time().minute())
             self._controller.start()
