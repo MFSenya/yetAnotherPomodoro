@@ -117,7 +117,9 @@ class PomodoroTimerController(QObject):
         self._timer.start()
 
     def stop(self):
+        self._timer.stop()
         self.currentCycle = 1
+        self._start_time = None
         self._elapsed_time = timedelta()
         self.currentMode = self.Mode.IDLE
         self.finished.emit()
