@@ -155,6 +155,7 @@ class PomodoroTimerView(QStackedWidget):
             # Controller
             self._controller = controller
             self._controller.time_changed.connect(self.__on_controller_time_changed)
+            self._controller.mode_changed.connect(self.__on_controller_mode_changed)
             # Layout
             layout = QGridLayout()
             layout.addWidget(self.button_toggle_pause, 1, 0)
@@ -162,8 +163,11 @@ class PomodoroTimerView(QStackedWidget):
             layout.addWidget(self._progress_bar, 0, 0, 1, 2)
             self.setLayout(layout)
 
+
         def __on_controller_time_changed(self):
-            self._progress_bar.progressValue = self._controller.currentIntervalProgress
+            self._progress_bar.progressValue = self._controller.currentIntervalProgress \
+                                            if self._controller.currentMode != self._controller.Mode.IDLE \
+                                            else 0
 
         def __on_stop_cycle_button_clicked(self):
             self._controller.stop()
@@ -173,22 +177,23 @@ class PomodoroTimerView(QStackedWidget):
             self.stop_button_clicked.emit()
 
         def __on_toggle_pause_button_clicked(self):
-            def add_fancy_stuff():
-                if self._controller.currentMode == self._controller.Mode.IDLE:
-                    toggle_pause_button_text = "Continue"
-                    # reduce bar color saturation
-                    h, s, v, a = self._progress_bar.barColor.getHsv()
-                    s_reduced = int(s * 0.5)
-                    progress_bar_color = QColor.fromHsv(h, s_reduced, v, a)
-                    self._progress_bar.barColor = progress_bar_color
-                    self.button_toggle_pause.setText(toggle_pause_button_text)
-                else:
-                    self.__return_to_default_view()
             self._controller.toggle_pause()
             # so that the progress bar renders up to the current progress value
             self._progress_bar.update()
-            add_fancy_stuff()
             self.toggle_pause_button_clicked.emit()
+
+        def __on_controller_mode_changed(self):
+            self._progress_bar.centralText = str(self._controller.currentMode.name)
+            if self._controller.currentMode == self._controller.Mode.IDLE:
+                toggle_pause_button_text = "Continue"
+                self.button_toggle_pause.setText(toggle_pause_button_text)
+                # reduce bar color saturation
+                h, s, v, a = self._progress_bar.barColor.getHsv()
+                s_reduced = int(s * 0.5)
+                progress_bar_color = QColor.fromHsv(h, s_reduced, v, a)
+                self._progress_bar.barColor = progress_bar_color
+            else:
+                self.__return_to_default_view()
 
 
     def __init__(self, parent=None, controller=None):
@@ -199,10 +204,10 @@ class PomodoroTimerView(QStackedWidget):
         # Windows
         self.addWidget(self.start_screen)
         self.addWidget(self.work_screen)
-        # Subscribe to window signals
+        # Subscribe signals
         self.start_screen.start_button_clicked.connect(self.__on_button_start_cycle_clicked)
-        self.work_screen.stop_button_clicked.connect(self._on_button_stop_cycle_clicked)
-        
+        self.work_screen.stop_button_clicked.connect(self.__handle_end_of_work)
+        self._controller.finished.connect(self.__handle_end_of_work)
         # Settings
         self.setCurrentIndex(0)
         self.setMinimumSize(400, 400)
@@ -211,9 +216,10 @@ class PomodoroTimerView(QStackedWidget):
         # Switch to Work screen
         self.setCurrentIndex(1)
 
-    def _on_button_stop_cycle_clicked(self):
+    def __handle_end_of_work(self):
         # Switch to Start screen
         self.setCurrentIndex(0)
+
 
     def _on_button_toggle_pause_clicked(self):
         pass
