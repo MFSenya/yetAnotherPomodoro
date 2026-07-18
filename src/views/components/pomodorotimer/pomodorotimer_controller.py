@@ -8,7 +8,6 @@ from PySide6.QtCore import QObject, Signal, QTimer
 class PomodoroTimerController(QObject):
     # Signals
     finished = Signal()
-    period_changed = Signal()
     time_changed = Signal()
     mode_changed = Signal()
 
@@ -34,13 +33,18 @@ class PomodoroTimerController(QObject):
         self._timer = QTimer(self)
         self._timer.setInterval(timer_interval_ms)
         self._timer.timeout.connect(self.__tick)
-        self._new_period_auto_start = False
+        self._auto_start = False
 
 
     @property
     def elapsedTime(self) -> timedelta:
         """Get elapsed time."""
         return self._elapsed_time
+    
+    @elapsedTime.setter
+    def elapsedTime(self, value: timedelta):
+        self._elapsed_time = value
+        self.time_changed.emit()
 
     @property
     def currentMode(self):
@@ -49,17 +53,18 @@ class PomodoroTimerController(QObject):
     
     @currentMode.setter
     def currentMode(self, mode: Mode):
-        self._current_mode = mode
-        self.mode_changed.emit()
+        if self._current_mode != mode:
+            self._current_mode = mode
+            self.mode_changed.emit()
 
     @property
     def newPeriodAutoStart(self):
         """Start new periods automatically."""
-        return self._new_period_auto_start
+        return self._auto_start
     
     @newPeriodAutoStart.setter
     def newPeriodAutoStart(self, new_period_auto_start: bool):
-        self._new_period_auto_start = new_period_auto_start
+        self._auto_start = new_period_auto_start
 
     
     @property
@@ -96,7 +101,14 @@ class PomodoroTimerController(QObject):
         """Get progress in percents for current interval."""
         if self._start_time is None:
             raise self.PomodoroTimerException("Сan't get current progress. Timer has not been started")
-        progress_value = int(self.elapsedTime.total_seconds() / self.__get_time_interval().total_seconds() * 100)
+        time_interval_current_mode_total_seconds = self.__get_time_interval().total_seconds()
+        # Time Interval for current mode is not zero
+        if time_interval_current_mode_total_seconds != 0:
+            progress_value = int(self.elapsedTime.total_seconds() / self.__get_time_interval().total_seconds() * 100)
+        # If not
+        else:
+            # Consider that progress is 100 percents
+            progress_value = 100
         return progress_value 
 
 
@@ -106,29 +118,28 @@ class PomodoroTimerController(QObject):
                 self._timer.stop()
                 self.currentMode = self.Mode.IDLE
             case self.Mode.IDLE:
-                self.currentMode = self._next_mode
-                self._timer.start()
+                self.start()
             case _:
                 raise self.PomodoroTimerException("Can't pause in this mode")
     
     def start(self):
         self.currentMode = self._next_mode
-        self._start_time = datetime.now()
+        if self._start_time is None:
+            self._start_time = datetime.now()
         self._timer.start()
 
     def stop(self):
         self._timer.stop()
-        self.currentCycle = 1
+        self._current_cycle = 1
         self._start_time = None
-        self._elapsed_time = timedelta()
         self.currentMode = self.Mode.IDLE
+        self.elapsedTime = timedelta()
         self.finished.emit()
 
 
     def __tick(self):
-        self._elapsed_time = datetime.now() - self._start_time
-        self.time_changed.emit()
-        if self._elapsed_time > self.__get_time_interval():
+        self.elapsedTime = datetime.now() - self._start_time
+        if self.elapsedTime > self.__get_time_interval():
             self.__period_finished()
 
 
@@ -136,7 +147,12 @@ class PomodoroTimerController(QObject):
     def __get_next_mode(self):
          match self._current_mode:
             case self.Mode.WORK:
-                return self.Mode.REST
+                # If rest time is not zero, we change to rest
+                if self._rest_time_interval > timedelta():
+                    return self.Mode.REST
+                else:
+                    # mode stays the same
+                    return self.Mode.WORK
             case self.Mode.REST:
                 return self.Mode.WORK
             case _:
@@ -157,15 +173,18 @@ class PomodoroTimerController(QObject):
 
     def __period_finished(self):
         self._next_mode = self.__get_next_mode()
-        # If a period finished in rest, it means that cycle is finished, too
-        if self._current_mode == self.Mode.REST:
+        self._start_time = None
+        # If a period finished in rest, it means that cycle is finished, too.
+        # Also we finish cycle if rest time is zero
+        if self._current_mode == self.Mode.REST or self._rest_time_interval == timedelta():
             self._current_cycle += 1
             if self._current_cycle > self.numberOfCycles:
                 self.stop()
+                return
+        if self._auto_start:
+            self.start()
         else:
-            if self._new_period_auto_start:
-                self.start()
-            else:
-                self.toggle_pause()
-            self.period_changed.emit()
+            self.toggle_pause()
+            # Next toggle_pause will run new period, so we need to reset an elapsed time to main all variables in consistent state
+            self.elapsedTime = timedelta()
         
