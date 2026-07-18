@@ -60,6 +60,7 @@ class PomodoroTimerView(QStackedWidget):
                 self._value = 0
                 self._bg_color = QColor("#ffffff")
                 self._progress_bar_color = QColor("#4a62ad")
+                self._central_text = ""
 
             @Property(QColor)
             def barColor(self) -> QColor:
@@ -94,7 +95,16 @@ class PomodoroTimerView(QStackedWidget):
             def progressValue(self, value: int):
                 self._value = value
                 self.update()
-            
+
+            @property
+            def centralText(self):
+                """Text in the bar center"""
+                return self._central_text
+
+            @centralText.setter
+            def centralText(self, text: str):
+                self._central_text = text
+                
 
             def paintEvent(self, event):
                 painter = QPainter(self)
@@ -102,16 +112,24 @@ class PomodoroTimerView(QStackedWidget):
                 painter.setRenderHint(QPainter.RenderHint.Antialiasing)
                 # Draw background
                 painter.fillRect(self.rect(), self.backgroundColor)
-                # Draw scale
+                # Draw bar
                 size = min(self.width(), self.height()) - 40
                 x = (self.width() - size) // 2
                 y = (self.height() - size) // 2
-                scale_rect = QRect(x, y, size, size)
+                progress_bar_rect = QRect(x, y, size, size)
                 painter.setPen(QPen(QColor("#eaeaea"), 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-                painter.drawEllipse(scale_rect)
+                painter.drawEllipse(progress_bar_rect)
                 painter.setPen(QPen(self.barColor, 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
                 span_angle = int(-self.progressValue * 16 * 3.6)
-                painter.drawArc(scale_rect, 90 * 16, span_angle)
+                painter.drawArc(progress_bar_rect, 90 * 16, span_angle)
+                # Draw central text
+                painter.setPen(QPen(QColor("#000000"), 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                font = painter.font()
+                font.setBold(True)
+                font.setPointSize(size / 5)
+                painter.setFont(font)
+                painter.drawText(progress_bar_rect, Qt.AlignmentFlag.AlignCenter, f"{self.centralText}")        
+                painter.end()
 
         @dataclass
         class DefaultState:
