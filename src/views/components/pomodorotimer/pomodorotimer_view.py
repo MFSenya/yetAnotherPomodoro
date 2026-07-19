@@ -1,7 +1,7 @@
 from datetime import timedelta
 from dataclasses import dataclass
 
-from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy
+from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox
 from PySide6.QtGui import QPainter, QColor, QPen
 from PySide6.QtCore import Property, Qt, QRect, QTime, Signal
 
@@ -32,12 +32,14 @@ class PomodoroTimerView(QStackedWidget):
             # Other
             self._spinbox_number_of_cycles = QSpinBox(minimum=1)
             self._spinbox_number_of_cycles.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+            self._checkbox_next_period_auto_run = QCheckBox("Next period auto run")
             # Layout
             _layout = QGridLayout()
             _layout.addWidget(self._time_edit_work_time_interval, 0, 0)
             _layout.addWidget(self._time_edit_rest_time_interval, 0, 1)
             _layout.addWidget(self._spinbox_number_of_cycles, 1, 0, 1, 2, alignment=Qt.AlignHCenter)
-            _layout.addWidget(self._button_start_cycle, 2, 0, 1, 2)
+            _layout.addWidget(self._checkbox_next_period_auto_run, 2, 0, 1, 2, alignment=Qt.AlignHCenter)
+            _layout.addWidget(self._button_start_cycle, 3, 0, 1, 2)
             # Settings
             self.setLayout(_layout)
         
@@ -45,6 +47,7 @@ class PomodoroTimerView(QStackedWidget):
             self._controller.numberOfCycles = self._spinbox_number_of_cycles.value()
             self._controller.workTimeInterval = timedelta(minutes=self._time_edit_work_time_interval.time().minute())
             self._controller.restTimeInterval = timedelta(minutes=self._time_edit_rest_time_interval.time().minute())
+            self._controller.newPeriodAutoStart = self._checkbox_next_period_auto_run.isChecked()
             self._controller.start()
             self.start_button_clicked.emit()
 
