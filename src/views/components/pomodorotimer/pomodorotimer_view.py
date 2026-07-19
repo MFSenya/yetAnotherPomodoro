@@ -1,7 +1,6 @@
 from datetime import timedelta
-from dataclasses import dataclass
 
-from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox
+from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
 from PySide6.QtGui import QPainter, QColor, QPen
 from PySide6.QtCore import Property, Qt, QRect, QTime, Signal
 
@@ -17,29 +16,45 @@ class PomodoroTimerView(QStackedWidget):
             self._controller = controller
             # Buttons
             self._button_start_cycle = QPushButton("Start")
+            self._button_start_cycle.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
             self._button_start_cycle.setStyleSheet("margin: 10px;")
             self._button_start_cycle.clicked.connect(self.__on_button_start_cycle_click)
             # TimeEdits
             time_edit_display_format = "mm"
             set_calendar_popup = False
+            time_edit_style_sheet = """
+                QTimeEdit {
+                    selection-background-color: transparent;
+                    selection-color: #000000;
+                }   
+            """
             self._time_edit_work_time_interval = QTimeEdit()
             self._time_edit_work_time_interval.setDisplayFormat(time_edit_display_format)
             self._time_edit_work_time_interval.setCalendarPopup(set_calendar_popup)
             self._time_edit_work_time_interval.setMinimumTime(QTime(0, 1))
+            self._time_edit_work_time_interval.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+            self._time_edit_work_time_interval.setStyleSheet(time_edit_style_sheet)
             self._time_edit_rest_time_interval = QTimeEdit()
             self._time_edit_rest_time_interval.setDisplayFormat(time_edit_display_format)
             self._time_edit_rest_time_interval.setCalendarPopup(set_calendar_popup)
+            self._time_edit_rest_time_interval.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+            self._time_edit_rest_time_interval.setStyleSheet(time_edit_style_sheet)
             # Other
             self._spinbox_number_of_cycles = QSpinBox(minimum=1)
             self._spinbox_number_of_cycles.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
             self._checkbox_next_period_auto_run = QCheckBox("Next period auto run")
+            spacer = QSpacerItem(20, 100, QSizePolicy.Minimum, QSizePolicy.Expanding)
             # Layout
             _layout = QGridLayout()
             _layout.addWidget(self._time_edit_work_time_interval, 0, 0)
             _layout.addWidget(self._time_edit_rest_time_interval, 0, 1)
             _layout.addWidget(self._spinbox_number_of_cycles, 1, 0, 1, 2, alignment=Qt.AlignHCenter)
             _layout.addWidget(self._checkbox_next_period_auto_run, 2, 0, 1, 2, alignment=Qt.AlignHCenter)
-            _layout.addWidget(self._button_start_cycle, 3, 0, 1, 2)
+            _layout.addItem(spacer, 3, 0)
+            _layout.addWidget(self._button_start_cycle, 4, 0, 1, 2)
+            _layout.setRowStretch(0, 1)
+            _layout.setRowStretch(3, 2)
+            _layout.setRowStretch(4, 2)
             # Settings
             self.setLayout(_layout)
         
@@ -174,11 +189,14 @@ class PomodoroTimerView(QStackedWidget):
             super().__init__()
             self._progress_bar = self.ProgressBar(controller)
             # Buttons
+            buttons_margin = 5
             self.button_stop_cycle = QPushButton("Stop", self)
-            self.button_stop_cycle.setStyleSheet("margin: 10px;")
+            self.button_stop_cycle.setStyleSheet(f"margin: {buttons_margin} px;")
+            self.button_stop_cycle.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
             self.button_stop_cycle.clicked.connect(self.__on_stop_cycle_button_clicked)
             self.button_toggle_pause = QPushButton("Pause", self)
-            self.button_toggle_pause.setStyleSheet("margin: 10px;")
+            self.button_toggle_pause.setStyleSheet(f"margin: {buttons_margin} px;")
+            self.button_toggle_pause.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
             self.button_toggle_pause.clicked.connect(self.__on_toggle_pause_button_clicked)
             # Controller
             self._controller = controller
@@ -188,6 +206,8 @@ class PomodoroTimerView(QStackedWidget):
             layout.addWidget(self.button_toggle_pause, 1, 0)
             layout.addWidget(self.button_stop_cycle, 1, 1)
             layout.addWidget(self._progress_bar, 0, 0, 1, 2)
+            layout.setRowStretch(0, 5)
+            layout.setRowStretch(1, 1)
             self.setLayout(layout)
 
 
@@ -220,7 +240,7 @@ class PomodoroTimerView(QStackedWidget):
         self._controller.finished.connect(self.__handle_end_of_work)
         # Settings
         self.setCurrentIndex(0)
-        self.setMinimumSize(400, 400)
+        self.setMinimumSize(300, 300)
         
     def __on_button_start_cycle_clicked(self):
         # Switch to Work screen
