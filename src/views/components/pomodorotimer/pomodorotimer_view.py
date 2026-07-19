@@ -64,33 +64,48 @@ class PomodoroTimerView(QStackedWidget):
                 self._controller.time_changed.connect(self.__on_controller_time_changed)
                 self._controller.mode_changed.connect(self.__on_controller_mode_changed)
                 self._value = 0
-                self._bg_color = QColor("#ffffff")
-                self._progress_bar_color = QColor("#4a62ad")
+                self._background = QColor("#ffffff")
+                self._progress_line_color = QColor("#4a62ad")
+                self._bar_background_color = QColor("#eaeaea")
+                self._central_text_color = QColor("#000000")
                 self._central_text = ""
 
             @Property(QColor)
-            def barColor(self) -> QColor:
-                return self._progress_bar_color
+            def progressLineColor(self) -> QColor:
+                return self._progress_line_color
             
-            @barColor.setter
-            def barColor(self, color):
-                # Qt Designer can pass color in different formats, 
-                # so we need to force cast to QColor
-                self._progress_bar_color = QColor(color)
+            @progressLineColor.setter
+            def progressLineColor(self, color):
+                self._progress_line_color = QColor(color)
                 self.update()
-
 
             @Property(QColor)
             def backgroundColor(self):
-                return self._bg_color
+                return self._background
             
             @backgroundColor.setter
             def backgroundColor(self, color):
-                # Qt Designer can pass color in different formats, 
-                # so we need to force cast to QColor
-                self._bg_color = QColor(color)
-                # Redraw after gauge color change
+                self._background = QColor(color)
                 self.update() 
+
+            @Property(QColor)
+            def barBackgroundColor(self):
+                return self._bar_background_color
+            
+            @barBackgroundColor.setter
+            def barBackgroundColor(self, color):
+                self._bar_background_color = QColor(color)
+                self.update()
+
+            @Property(QColor)
+            def centralTextColor(self):
+                return self._central_text_color
+
+            @centralTextColor.setter
+            def centralTextColor(self, color):
+                self._central_text_color = QColor(color)
+                self.update()
+
 
             @property
             def progressValue(self):
@@ -123,20 +138,20 @@ class PomodoroTimerView(QStackedWidget):
                 x = (self.width() - size) // 2
                 y = (self.height() - size) // 2
                 progress_bar_rect = QRect(x, y, size, size)
-                painter.setPen(QPen(QColor("#eaeaea"), 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                painter.setPen(QPen(self.barBackgroundColor, 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
                 painter.drawEllipse(progress_bar_rect)
                 if self._controller.currentMode == self._controller.Mode.IDLE:
                     # reduce bar color saturation
-                    h, s, v, a = self.barColor.getHsv()
+                    h, s, v, a = self.progressLineColor.getHsv()
                     s_reduced = int(s * 0.5)
                     bar_color = QColor.fromHsv(h, s_reduced, v, a)
                 else:
-                    bar_color = self.barColor
+                    bar_color = self.progressLineColor
                 painter.setPen(QPen(bar_color, 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
                 span_angle = int(-self.progressValue * 16 * 3.6)
                 painter.drawArc(progress_bar_rect, 90 * 16, span_angle)
                 # Draw central text
-                painter.setPen(QPen(QColor("#000000"), 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+                painter.setPen(QPen(self.centralTextColor, 20, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
                 font = painter.font()
                 font.setBold(True)
                 font.setPointSize(size / 5)
