@@ -2,9 +2,11 @@ from datetime import timedelta
 
 from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
 from PySide6.QtGui import QPainter, QColor, QPen
-from PySide6.QtCore import Property, Qt, QRect, QTime, Signal
+from PySide6.QtCore import Property, Qt, QRect, QTime, Signal, QUrl
+from PySide6.QtMultimedia import QSoundEffect
 
 from .pomodorotimer_controller import PomodoroTimerController
+import src.resources_rc
 
 
 class PomodoroTimerView(QStackedWidget):
@@ -78,12 +80,15 @@ class PomodoroTimerView(QStackedWidget):
                 self._controller = controller
                 self._controller.time_changed.connect(self.__on_controller_time_changed)
                 self._controller.mode_changed.connect(self.__on_controller_mode_changed)
+                self._controller.period_changed.connect(self.__on_controller_period_changed)
                 self._value = 0
                 self._background = QColor("#ffffff")
                 self._progress_line_color = QColor("#4a62ad")
                 self._bar_background_color = QColor("#eaeaea")
                 self._central_text_color = QColor("#000000")
                 self._central_text = ""
+                self._period_changed_sound = QSoundEffect()
+                self._period_changed_sound.setSource(QUrl("qrc:/assets/alert.wav"))
 
             @Property(QColor)
             def progressLineColor(self) -> QColor:
@@ -183,6 +188,8 @@ class PomodoroTimerView(QStackedWidget):
                 self.centralText = str(self._controller.currentMode.name)
                 self.update()
 
+            def __on_controller_period_changed(self):
+                self._period_changed_sound.play()
 
 
         def __init__(self, controller: PomodoroTimerController):
