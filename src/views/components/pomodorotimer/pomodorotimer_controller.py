@@ -10,6 +10,7 @@ class PomodoroTimerController(QObject):
     finished = Signal()
     time_changed = Signal()
     mode_changed = Signal()
+    period_changed = Signal()
 
     class PomodoroTimerException(Exception):
         def __init__(self, message: str):
@@ -180,11 +181,11 @@ class PomodoroTimerController(QObject):
             self._current_cycle += 1
             if self._current_cycle > self.numberOfCycles:
                 self.stop()
-                return
-        if self._auto_start:
-            self.start()
         else:
-            self.toggle_pause()
-            # Next toggle_pause will run new period, so we need to reset an elapsed time to main all variables in consistent state
-            self.elapsedTime = timedelta()
-        
+            if self._auto_start:
+                self.start()
+            else:
+                self.toggle_pause()
+                # Next toggle_pause will run new period, so we need to reset an elapsed time to main all variables in consistent state
+                self.elapsedTime = timedelta()
+        self.period_changed.emit()
