@@ -5,6 +5,7 @@ from .components.pomodorotimer.pomodorotimer_view import PomodoroTimerView
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("yetAnotherPomodoro")
         self.stacked_widget = QStackedWidget(self)
         self.pomodoro_timer = PomodoroTimerView()
         self.stacked_widget.addWidget(self.pomodoro_timer)
