@@ -68,8 +68,6 @@ class PomodoroTimerView(QStackedWidget):
             self._controller.start()
             self.start_button_clicked.emit()
 
-
-
     class WorkScreen(QWidget):
         stop_button_clicked = Signal()
         toggle_pause_button_clicked = Signal()
