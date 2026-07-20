@@ -1,16 +1,16 @@
 from dataclasses import dataclass, field, fields
 from datetime import timedelta, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import List, Optional
 
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
 
 @dataclass
 class Task:
-    class Status(Enum):
-        OPEN = 1
-        CLOSED = 2
-        POSTPONED = 3
+    class Status(StrEnum):
+        OPEN = "Open"
+        CLOSED = "Closed"
+        POSTPONED = "Postponed"
 
     name: str = field(metadata={"alias": "Name"})
     open_time: datetime = field(metadata={"alias": "Open time"})
@@ -47,7 +47,7 @@ class TaskListModel(QAbstractTableModel):
         value = getattr(task, field_info.name)
 
         if role == Qt.ItemDataRole.DisplayRole:
-            if isinstance(value, Enum):
+            if isinstance(value, StrEnum):
                 return value.value
             return str(value)
     
