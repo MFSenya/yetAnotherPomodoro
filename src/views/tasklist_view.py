@@ -1,40 +1,69 @@
 from datetime import timedelta
+from collections.abc import Sequence
 
-from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
+from PySide6.QtWidgets import (QStyledItemDelegate, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLineEdit, QPushButton, QTableView, QHeaderView, 
-                             QDateTimeEdit, QComboBox)
+                             QComboBox, QAbstractItemView, QStyle)
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QDateTime
 
 from src.models.tasklist_model import TaskListModel, Task
 
 class TaskListView(QWidget):
+
+    class ComboBoxViewDelegate(QStyledItemDelegate):
+        """Replaces QLineEdit with QComboBox."""
+
+        def createEditor(self, parent, option, index):
+            items = index.model().data(index, Qt.ItemDataRole.UserRole)
+
+            if isinstance(items, Sequence):
+                editor = QComboBox(parent)
+                editor.addItems(items)
+                return editor
+
+            return super().createEditor(parent, option, index)
+        
+        def setEditorData(self, editor, index):
+            if isinstance(editor, QComboBox):
+                current_text = index.model().data(index, Qt.ItemDataRole.EditRole)
+                pos = editor.findText(str(current_text))
+                if pos >= 0:
+                    editor.setCurrentIndex(pos)
+            else:
+                super().setEditorData(editor, index)
+
+        def setModelData(self, editor, model, index):
+            if isinstance(editor, QComboBox):
+                model.setData(index, editor.currentText(), Qt.ItemDataRole.EditRole)
+            else:
+                super().setModelData(editor, model, index)
+
     def __init__(self):
         super().__init__()
         self.model = TaskListModel()
         self.view = QTableView(self)
         self.view.setModel(self.model)
-
+        self.view.horizontalHeader().setHighlightSections(False)
+        self.view.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
+        self.view.setItemDelegate(self.ComboBoxViewDelegate(self.view))
+        
         main_layout = QVBoxLayout(self)
 
         # Input form
         input_layout = QHBoxLayout()
         self.task_input = QLineEdit(self)
-        self.task_input.setPlaceholderText("Task name...")
-
-        self.datetime_input = QDateTimeEdit(self)
-        self.datetime_input.setDateTime(QDateTime.currentDateTime())
+        self.task_input.setPlaceholderText("Enter task name...")
 
         self.button_add = QPushButton("Add", self)
         self.button_add.clicked.connect(self.add_task)
 
         input_layout.addWidget(self.task_input, stretch=3)
-        input_layout.addWidget(self.datetime_input, stretch=1)
         input_layout.addWidget(self.button_add, stretch=1)
 
         # Columns appearance
         header = self.view.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.view.setSelectionBehavior(QTableView.SelectRows)
@@ -50,7 +79,7 @@ class TaskListView(QWidget):
         name = self.task_input.text().strip()
         if not name:
             return
-        open_time = self.datetime_input.dateTime().toPython()
+        open_time = QDateTime().currentDateTime().toPython()
         self.model.add_task(Task(name, open_time, timedelta(), Task.Status.OPEN))
         self.task_input.clear()
 
