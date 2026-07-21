@@ -14,3 +14,4 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.pomodoro_timer_view, "Timer")
         self.tabs.addTab(self.tasklist_view, "Tasks")
         self.tabs.setTabPosition(QTabWidget.West)
+        self.tabs.setContentsMargins(15, 15, 15, 15)
