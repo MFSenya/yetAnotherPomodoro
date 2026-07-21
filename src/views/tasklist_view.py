@@ -18,6 +18,8 @@ class TaskListView(QWidget):
 
             if isinstance(items, Sequence):
                 editor = QComboBox(parent)
+                editor.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+                editor.setAutoFillBackground(True)
                 editor.addItems(items)
                 return editor
 
@@ -44,9 +46,9 @@ class TaskListView(QWidget):
         self.view = QTableView(self)
         self.view.setModel(self.model)
         self.view.horizontalHeader().setHighlightSections(False)
+        self.view.verticalHeader().setVisible(False)
         self.view.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
         self.view.setItemDelegate(self.ComboBoxViewDelegate(self.view))
-        
         main_layout = QVBoxLayout(self)
 
         # Input form
