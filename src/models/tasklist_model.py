@@ -196,4 +196,14 @@ class TaskListModel(QAbstractTableModel):
         except Exception as e:
             self._session.rollback()
             print(f"An error occured while removing a task: {e}")
-            return False
+            return False 
+
+class OpenStatusFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def filterAcceptsRow(self, source_row, source_parent):
+        model = self.sourceModel()
+        base_index = model.index(source_row, 0, source_parent)
+        task : Task = model.data(base_index, Qt.ItemDataRole.UserRole)
+        return task.status == Task.Status.OPEN    
