@@ -112,6 +112,8 @@ class TaskListModel(QAbstractTableModel):
                         return str(value)
             case Qt.ItemDataRole.EditRole:
                     return value
+            case Qt.ItemDataRole.UserRole:
+                    return task
             
         return None
     
