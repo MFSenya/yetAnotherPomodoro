@@ -46,7 +46,7 @@ class Task(Base):
         return headers
         
 
-engine = create_engine('sqlite:///task_database.db', echo=False)
+engine = create_engine('sqlite:///db/task_database.db', echo=False)
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
 
