@@ -1,11 +1,12 @@
 from datetime import timedelta
 
-from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
+from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QListView, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
 from PySide6.QtGui import QPainter, QColor, QPen
 from PySide6.QtCore import Property, Qt, QRect, QTime, Signal, QUrl
 from PySide6.QtMultimedia import QSoundEffect
 
 from .pomodorotimer_controller import PomodoroTimerController
+from src.models.tasklist_model import TaskListModel, Task, OpenStatusFilterProxyModel
 import src.resources_rc
 
 
@@ -13,7 +14,7 @@ class PomodoroTimerView(QStackedWidget):
 
     class StartScreen(QWidget):
         start_button_clicked = Signal()
-        def __init__(self, controller: PomodoroTimerController):
+        def __init__(self, controller: PomodoroTimerController, task_list_model: TaskListModel):
             super().__init__()
             self._controller = controller
             # Buttons
@@ -45,14 +46,21 @@ class PomodoroTimerView(QStackedWidget):
             self._spinbox_number_of_cycles = QSpinBox(minimum=1)
             self._spinbox_number_of_cycles.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
             self._checkbox_next_period_auto_run = QCheckBox("Next period auto run")
-            spacer = QSpacerItem(20, 100, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            # List of open Tasks
+            self._open_tasks_model = OpenStatusFilterProxyModel(self)
+            self._open_tasks_model.setSourceModel(task_list_model)
+            self._open_tasks_list_view = QListView()
+            self._open_tasks_list_view.setModel(self._open_tasks_model)
+            self._open_tasks_list_view.setModelColumn(0)
+            self._open_tasks_list_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self._open_tasks_list_view.setMinimumHeight(100)
             # Layout
             _layout = QGridLayout()
             _layout.addWidget(self._time_edit_work_time_interval, 0, 0)
             _layout.addWidget(self._time_edit_rest_time_interval, 0, 1)
             _layout.addWidget(self._spinbox_number_of_cycles, 1, 0, 1, 2, alignment=Qt.AlignHCenter)
             _layout.addWidget(self._checkbox_next_period_auto_run, 2, 0, 1, 2, alignment=Qt.AlignHCenter)
-            _layout.addItem(spacer, 3, 0)
+            _layout.addWidget(self._open_tasks_list_view, 3, 0, 1, 2)
             _layout.addWidget(self._button_start_cycle, 4, 0, 1, 2)
             _layout.setRowStretch(0, 1)
             _layout.setRowStretch(3, 2)
@@ -231,10 +239,10 @@ class PomodoroTimerView(QStackedWidget):
                 self.button_toggle_pause.setText("Pause")
 
 
-    def __init__(self, parent=None, controller=None):
+    def __init__(self, task_list_model : TaskListModel, parent=None, controller=None):
         super().__init__(parent)
         self._controller =  controller if controller is not None else PomodoroTimerController()
-        self.start_screen = self.StartScreen(self._controller)
+        self.start_screen = self.StartScreen(self._controller, task_list_model)
         self.work_screen = self.WorkScreen(self._controller)
         # Windows
         self.addWidget(self.start_screen)
