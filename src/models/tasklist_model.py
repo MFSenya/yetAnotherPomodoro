@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
 from enum import StrEnum
+from typing import Optional
 
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
 from sqlalchemy import create_engine, inspect, Interval, DateTime, String, Column, Integer
@@ -100,7 +101,7 @@ class TaskListModel(QAbstractTableModel):
             case Qt.ItemDataRole.DisplayRole:
                  match value:
                     case Task.Status if field_name == "status":
-                        return value.value
+                        return value
                     case datetime() if field_name == "open_time":
                         return value.strftime("%Y-%m-%d %H:%M")
                     case timedelta() if field_name == "time_spent":
@@ -111,10 +112,17 @@ class TaskListModel(QAbstractTableModel):
                         return str(value)
             case Qt.ItemDataRole.EditRole:
                     return value
-            case Qt.ItemDataRole.UserRole:
-                if field_name == "status":
-                    return [item.value for item in Task.Status] if self._can_open_new_task() else [Task.Status.CLOSED]
+            
         return None
+    
+    def get_allowed_values_for_column(self, index) -> Optional[list]:
+        """Get allowed values for particular column. None means there aren't restrictions on column values."""
+        field_name = self._column_map[index.column()]
+        match field_name:
+            case "status":
+                return [item.value for item in Task.Status] if self._can_open_new_task() else [Task.Status.CLOSED]
+            case _:
+                return None
     
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
