@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Optional
 
 from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QListView, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
 from PySide6.QtGui import QPainter, QColor, QPen
@@ -17,6 +18,7 @@ class PomodoroTimerView(QStackedWidget):
         def __init__(self, controller: PomodoroTimerController, task_list_model: TaskListModel):
             super().__init__()
             self._controller = controller
+            self._selected_task: Optional[Task] = None
             # Buttons
             self._button_start_cycle = QPushButton("Start")
             self._button_start_cycle.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -54,6 +56,7 @@ class PomodoroTimerView(QStackedWidget):
             self._open_tasks_list_view.setModelColumn(0)
             self._open_tasks_list_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             self._open_tasks_list_view.setMinimumHeight(100)
+            self._open_tasks_list_view.clicked.connect(self.__on_task_selected)
             # Layout
             _layout = QGridLayout()
             _layout.addWidget(self._time_edit_work_time_interval, 0, 0)
@@ -68,13 +71,37 @@ class PomodoroTimerView(QStackedWidget):
             # Settings
             self.setLayout(_layout)
         
+
+        def __on_task_selected(self):
+             # Define selected task
+            selected_task_proxy_indexes = self._open_tasks_list_view.selectionModel().selectedIndexes()
+            if not selected_task_proxy_indexes:
+                self._selected_task = None
+                return
+            task_list_proxy_model = self._open_tasks_list_view.model()
+            # Can select only one task at a time
+            selected_task_proxy_index = selected_task_proxy_indexes[0]
+            selected_task_source_index = task_list_proxy_model.mapToSource(selected_task_proxy_index)
+            task_list_source_model = task_list_proxy_model.sourceModel()
+            selected_task =  task_list_source_model.data(selected_task_source_index, Qt.ItemDataRole.UserRole)
+            self._selected_task = selected_task
+
+
         def __on_button_start_cycle_click(self):
+            # Initialize pomodoro timer controller
             self._controller.numberOfCycles = self._spinbox_number_of_cycles.value()
             self._controller.workTimeInterval = timedelta(minutes=self._time_edit_work_time_interval.time().minute())
             self._controller.restTimeInterval = timedelta(minutes=self._time_edit_rest_time_interval.time().minute())
             self._controller.newPeriodAutoStart = self._checkbox_next_period_auto_run.isChecked()
+           
             self._controller.start()
             self.start_button_clicked.emit()
+
+        @property
+        def selectedTask(self):
+            return self._selected_task
+
+
 
     class WorkScreen(QWidget):
         stop_button_clicked = Signal()
