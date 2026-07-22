@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QStyledItemDelegate, QWidget, QVBoxLayout, QHBoxL
                              QComboBox, QAbstractItemView, QStyle)
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QDateTime
 
-from ..models.tasklist_model import TaskListModel, Task
+from ..models.tasklist_model import TaskListModel
 
 class TaskListView(QWidget):
 
