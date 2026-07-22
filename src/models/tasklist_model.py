@@ -138,8 +138,9 @@ class TaskListModel(QAbstractTableModel):
         
         return False
     
-    def add_task(self, name: str, open_time: datetime, time_spent: timedelta, status: Task.Status):
-        new_task = Task(name=name, open_time=open_time, time_spent=time_spent, status=status)
+    def add_task(self, name: str, open_time: datetime):
+        status = Task.Status.OPEN
+        new_task = Task(name=name, open_time=open_time, time_spent=timedelta(), status=status)
         self._session.add(new_task)
 
         try:

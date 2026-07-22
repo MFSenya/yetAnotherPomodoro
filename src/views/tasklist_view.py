@@ -82,7 +82,7 @@ class TaskListView(QWidget):
         if not name:
             return
         open_time = QDateTime().currentDateTime().toPython()
-        self.model.add_task(name, open_time, timedelta(), Task.Status.OPEN)
+        self.model.add_task(name, open_time)
         self.task_input.clear()
 
     def delete_task(self):
