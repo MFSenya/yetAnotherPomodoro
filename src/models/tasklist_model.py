@@ -147,7 +147,7 @@ class TaskListModel(QAbstractTableModel):
             self._session.commit()
             self._session.refresh(new_task)
 
-            row_count = len(self._tasks)
+            row_count = self.rowCount()
             self.beginInsertRows(QModelIndex(), row_count, row_count)
             self._tasks.append(new_task)
             self.endInsertRows()
@@ -160,7 +160,7 @@ class TaskListModel(QAbstractTableModel):
 
 
     def remove_task(self, row):
-        if row < 0 or row >= len(self._tasks):
+        if row < 0 or row >= self.rowCount():
             return False
 
         task_to_delete = self._tasks[row]
