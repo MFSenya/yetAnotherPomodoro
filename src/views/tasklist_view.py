@@ -10,13 +10,13 @@ from ..models.tasklist_model import TaskListModel
 
 class TaskListView(QWidget):
 
-    class ComboBoxViewDelegate(QStyledItemDelegate):
-        """Replaces QLineEdit with QComboBox."""
+    class ColumnComboBoxViewDelegate(QStyledItemDelegate):
+        """Replaces Editor with QComboBox."""
 
         def createEditor(self, parent, option, index):
-            items = index.model().data(index, Qt.ItemDataRole.UserRole)
+            items = index.model().get_allowed_values_for_column(index)
 
-            if isinstance(items, Sequence):
+            if items is not None and isinstance(items, Sequence):
                 editor = QComboBox(parent)
                 editor.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
                 editor.setAutoFillBackground(True)
@@ -48,7 +48,7 @@ class TaskListView(QWidget):
         self.view.horizontalHeader().setHighlightSections(False)
         self.view.verticalHeader().setVisible(False)
         self.view.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
-        self.view.setItemDelegate(self.ComboBoxViewDelegate(self.view))
+        self.view.setItemDelegateForColumn(3, self.ColumnComboBoxViewDelegate(self.view))
         main_layout = QVBoxLayout(self)
 
         # Input form
