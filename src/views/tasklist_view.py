@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QStyledItemDelegate, QWidget, QVBoxLayout, QHBoxL
                              QComboBox, QAbstractItemView, QStyle)
 from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex, QDateTime
 
-from src.models.tasklist_model import TaskListModel, Task
+from ..models.tasklist_model import TaskListModel, Task
 
 class TaskListView(QWidget):
 
@@ -40,9 +40,9 @@ class TaskListView(QWidget):
             else:
                 super().setModelData(editor, model, index)
 
-    def __init__(self):
+    def __init__(self, model: TaskListModel):
         super().__init__()
-        self.model = TaskListModel()
+        self.model = model
         self.view = QTableView(self)
         self.view.setModel(self.model)
         self.view.horizontalHeader().setHighlightSections(False)
