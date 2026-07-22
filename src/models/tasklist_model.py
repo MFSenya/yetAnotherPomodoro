@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from enum import StrEnum
 from typing import Optional
 
-from PySide6.QtCore import Qt, QAbstractTableModel, QModelIndex
+from PySide6.QtCore import Qt, QAbstractTableModel, QSortFilterProxyModel, QModelIndex
 from sqlalchemy import create_engine, inspect, Interval, DateTime, String, Column, Integer
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -30,12 +30,12 @@ class Task(Base):
         self.status = status
 
     @classmethod
-    def get_field_meta(cls, field_name: str) -> dict:
-        """Get metadata for a field."""
-        column = cls.__table__.columns.get(field_name)
+    def get_column_meta(cls, name: str) -> dict:
+        """Get a metadata for a column by its name."""
+        column = cls.__table__.columns.get(name)
         if column is not None:
             return column.info
-        raise AttributeError(f"Class {cls.__name__} doesn't have field with name {field_name}")
+        raise AttributeError(f"Class {cls.__name__} doesn't have column with name '{name}'")
 
     @classmethod
     def get_headers(cls) -> list[str]:
@@ -101,7 +101,7 @@ class TaskListModel(QAbstractTableModel):
             case Qt.ItemDataRole.DisplayRole:
                  match value:
                     case Task.Status if field_name == "status":
-                        return value
+                        return value.value
                     case datetime() if field_name == "open_time":
                         return value.strftime("%Y-%m-%d %H:%M")
                     case timedelta() if field_name == "time_spent":
