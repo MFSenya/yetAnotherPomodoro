@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("yetAnotherPomodoro")
         self.tabs = QTabWidget(self)
         self.setCentralWidget(self.tabs)
-        self.tasklist_model = TaskListModel()
+        self.tasklist_model = TaskListModel(opened_tasks_max_num=4)
         self.pomodoro_timer_view = PomodoroTimerView()
         self.tasklist_view = TaskListView(self.tasklist_model)
         self.tabs.addTab(self.pomodoro_timer_view, "Timer")

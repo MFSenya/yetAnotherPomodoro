@@ -51,12 +51,20 @@ Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
 
 class TaskListModel(QAbstractTableModel):
-    def __init__(self, parent=None):
+    def __init__(self, opened_tasks_max_num: int, parent=None):
+        """
+        
+        Args:
+            opened_tasks_max_num(int): max number of simultaneously opened tasks
+            parent: parent model
+
+        """
         super().__init__(parent)
         self._session = SessionLocal()
         self._tasks : list[Task] = self._session.query(Task).all()
         self._headers = Task.get_headers()
         self._column_map = [column.key for column in inspect(Task).attrs if column.key != "id"]
+        self._opened_tasks_max_num = opened_tasks_max_num
 
 
     def rowCount(self, parent=None):
@@ -105,7 +113,7 @@ class TaskListModel(QAbstractTableModel):
                     return value
             case Qt.ItemDataRole.UserRole:
                 if field_name == "status":
-                    return [item.value for item in Task.Status]
+                    return [item.value for item in Task.Status] if self._can_open_new_task() else [Task.Status.CLOSED]
         return None
     
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
@@ -138,8 +146,12 @@ class TaskListModel(QAbstractTableModel):
         
         return False
     
+    def _can_open_new_task(self) -> bool:
+        return sum(1 for task in self._tasks if task.status == Task.Status.OPEN) < self._opened_tasks_max_num
+    
     def add_task(self, name: str, open_time: datetime):
-        status = Task.Status.OPEN
+        # if max number of opened task exceeded than tasks create as closed
+        status = Task.Status.OPEN if self._can_open_new_task() else Task.Status.CLOSED
         new_task = Task(name=name, open_time=open_time, time_spent=timedelta(), status=status)
         self._session.add(new_task)
 
