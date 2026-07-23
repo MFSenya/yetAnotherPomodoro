@@ -139,6 +139,8 @@ class TaskListModel(QAbstractTableModel):
                     setattr(task, field_name, str(value).strip())
                 case "status":
                     setattr(task, field_name, Task.Status(value))
+                case "time_spent":
+                    setattr(task, field_name, value)
                 case _:
                     return False
 
