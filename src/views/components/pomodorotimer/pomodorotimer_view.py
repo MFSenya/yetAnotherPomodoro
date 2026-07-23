@@ -3,7 +3,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import QWidget, QStackedWidget, QPushButton, QListView, QGridLayout, QTimeEdit, QSpinBox, QSizePolicy, QCheckBox, QSpacerItem
 from PySide6.QtGui import QPainter, QColor, QPen
-from PySide6.QtCore import Property, Qt, QRect, QTime, Signal, QUrl
+from PySide6.QtCore import Property, Qt, QRect, QTime, Signal, QUrl, QModelIndex
 from PySide6.QtMultimedia import QSoundEffect
 
 from .pomodorotimer_controller import PomodoroTimerController
@@ -267,7 +267,8 @@ class PomodoroTimerView(QStackedWidget):
     def __init__(self, task_list_model : TaskListModel, parent=None, controller=None):
         super().__init__(parent)
         self._controller =  controller if controller is not None else PomodoroTimerController()
-        self.start_screen = self.StartScreen(self._controller, task_list_model)
+        self._task_list_model = task_list_model
+        self.start_screen = self.StartScreen(self._controller, self._task_list_model)
         self.work_screen = self.WorkScreen(self._controller)
         # Windows
         self.addWidget(self.start_screen)
@@ -284,7 +285,15 @@ class PomodoroTimerView(QStackedWidget):
         # Switch to Work screen
         self.setCurrentIndex(1)
 
-    def __handle_end_of_work(self):
+    def __handle_end_of_work(self, value):
+        selected_task_index = self.start_screen.selectedTaskIndex
+        # If task was selected, update it's time spent
+        if selected_task_index is not None:
+            time_spent_column_index = self._task_list_model.get_index(Task.time_spent)
+            index = self._task_list_model.index(selected_task_index.row(), time_spent_column_index)
+            selected_task_time_spent = self._task_list_model.data(index, Qt.ItemDataRole.EditRole)
+            selected_task_time_spent += value
+            self._task_list_model.setData(index, selected_task_time_spent, Qt.ItemDataRole.EditRole)
         # Switch to Start screen
         self.setCurrentIndex(0)
 
