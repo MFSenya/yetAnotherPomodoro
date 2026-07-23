@@ -29,7 +29,7 @@ class TestPomodoroTimerControllerSignals:
 
     def compare_elapsed_time(self, controller: PomodoroTimerController, expected_time: timedelta, allowed_delta):
         """Compare timer elapsed time with expected value."""
-        actual_time = controller.elapsedTime
+        actual_time = controller.currentPeriodElapsedTime
         assert abs(actual_time - expected_time) <= allowed_delta, f"Expected elapsed time: {expected_time}, Actual elapsed time: {actual_time}"
 
 
@@ -78,7 +78,7 @@ class TestPomodoroTimerControllerSignals:
         timer_controller.stop()
         # Wait for finish signal
         qtbot.waitUntil(lambda: finished_spy.count() == 1, timeout=100)
-        assert timer_controller.elapsedTime == timedelta()
+        assert timer_controller.currentPeriodElapsedTime == timedelta()
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
 
 
@@ -135,7 +135,7 @@ class TestPomodoroTimerControllerSignals:
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
         timer_controller.stop()
         assert timer_controller.currentMode == timer_controller.Mode.IDLE
-        assert timer_controller.elapsedTime == timedelta()
+        assert timer_controller.currentPeriodElapsedTime == timedelta()
 
     def test_timer_resumes_correctly_after_a_pause(self, qapp):
         """Test resume after a pause."""
