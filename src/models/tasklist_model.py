@@ -16,9 +16,9 @@ class Task(Base):
         OPEN = "Open"
         CLOSED = "Closed"
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, info={"alias": "Id"})
     name = Column(String, info={"alias": "Name"})
-    open_time = Column(DateTime, info={"alias": "Open time"})
+    open_time = Column(DateTime, info={"alias": "Creation time"})
     time_spent = Column(Interval, info={"alias": "Time spent (H:M)"})
     status = Column(String, info={"alias": "Status"})
 
@@ -30,18 +30,9 @@ class Task(Base):
         self.status = status
 
     @classmethod
-    def get_column_meta(cls, name: str) -> dict:
-        """Get a metadata for a column by its name."""
-        column = cls.__table__.columns.get(name)
-        if column is not None:
-            return column.info
-        raise AttributeError(f"Class {cls.__name__} doesn't have column with name '{name}'")
-
-    @classmethod
-    def get_headers(cls) -> list[str]:
+    def get_headers(cls, columns) -> list[str]:
         headers = []
-        for column in cls.__table__.columns:
-            if column.name != 'id':
+        for column in columns:
                 # Gat alias from info, if it is not there, use the columns with the name
                 headers.append(column.info.get("alias", column.name))
         return headers
@@ -63,8 +54,8 @@ class TaskListModel(QAbstractTableModel):
         super().__init__(parent)
         self._session = SessionLocal()
         self._tasks : list[Task] = self._session.query(Task).all()
-        self._headers = Task.get_headers()
-        self._column_map = [column.key for column in inspect(Task).attrs if column.key != "id"]
+        self._columns = [column for column in inspect(Task).columns if column.name != "id"]
+        self._headers = Task.get_headers(self._columns)
         self._opened_tasks_max_num = opened_tasks_max_num
 
 
@@ -79,8 +70,7 @@ class TaskListModel(QAbstractTableModel):
             return Qt.NoItemFlags
         
         default_flags = super().flags(index)
-
-        field_name = self._column_map[index.column()]
+        field_name = self._columns[index.column()].name
         # Only name and status columns are modifiable
         if field_name in ("name", "status"):
             return default_flags | Qt.ItemFlag.ItemIsEditable
@@ -94,7 +84,7 @@ class TaskListModel(QAbstractTableModel):
             return None
         
         task = self._tasks[index.row()]
-        field_name = self._column_map[index.column()]
+        field_name = self._columns[index.column()].name
         value = getattr(task, field_name)
 
         match role:
@@ -119,12 +109,17 @@ class TaskListModel(QAbstractTableModel):
     
     def get_allowed_values_for_column(self, index) -> Optional[list]:
         """Get allowed values for particular column. None means there aren't restrictions on column values."""
-        field_name = self._column_map[index.column()]
+        field_name = self._columns[index.column()].name
         match field_name:
             case "status":
                 return [item.value for item in Task.Status] if self._can_open_new_task() else [Task.Status.CLOSED]
             case _:
                 return None
+
+    def get_index(self, column):
+        """Get column index."""
+        index = self._columns.index(column)
+        return index
     
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
@@ -136,7 +131,7 @@ class TaskListModel(QAbstractTableModel):
             return False
     
         task = self._tasks[index.row()]
-        field_name = self._column_map[index.column()]
+        field_name = self._columns[index.column()].name
 
         try:
             match field_name:
