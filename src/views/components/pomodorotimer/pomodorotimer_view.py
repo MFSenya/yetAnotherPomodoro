@@ -18,7 +18,7 @@ class PomodoroTimerView(QStackedWidget):
         def __init__(self, controller: PomodoroTimerController, task_list_model: TaskListModel):
             super().__init__()
             self._controller = controller
-            self._selected_task: Optional[Task] = None
+            self._selected_task_index: Optional[QModelIndex] = None
             # Buttons
             self._button_start_cycle = QPushButton("Start")
             self._button_start_cycle.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -76,15 +76,13 @@ class PomodoroTimerView(QStackedWidget):
              # Define selected task
             selected_task_proxy_indexes = self._open_tasks_list_view.selectionModel().selectedIndexes()
             if not selected_task_proxy_indexes:
-                self._selected_task = None
+                self._selected_task_index = None
                 return
             task_list_proxy_model = self._open_tasks_list_view.model()
             # Can select only one task at a time
             selected_task_proxy_index = selected_task_proxy_indexes[0]
             selected_task_source_index = task_list_proxy_model.mapToSource(selected_task_proxy_index)
-            task_list_source_model = task_list_proxy_model.sourceModel()
-            selected_task =  task_list_source_model.data(selected_task_source_index, Qt.ItemDataRole.UserRole)
-            self._selected_task = selected_task
+            self._selected_task_index = selected_task_source_index
 
 
         def __on_button_start_cycle_click(self):
@@ -98,8 +96,8 @@ class PomodoroTimerView(QStackedWidget):
             self.start_button_clicked.emit()
 
         @property
-        def selectedTask(self):
-            return self._selected_task
+        def selectedTaskIndex(self):
+            return self._selected_task_index
 
 
 
